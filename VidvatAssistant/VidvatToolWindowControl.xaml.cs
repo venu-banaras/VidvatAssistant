@@ -3,6 +3,7 @@ using Microsoft.Web.WebView2.Wpf;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -13,29 +14,29 @@ namespace VidvatAssistant
         public VidvatToolWindowControl()
         {
             InitializeComponent();
-            Loaded += ControlLoaded;
+            Loaded += async (_, __) => await InitializeWebViewAsync();
         }
 
-        private async void ControlLoaded(object sender, RoutedEventArgs e)
+        private async Task InitializeWebViewAsync()
         {
             try
             {
-                await Web.EnsureCoreWebView2Async();
+                string userDataFolder =
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                                 "VidvatAssistant", "WebView2");
+
+                Directory.CreateDirectory(userDataFolder);
+
+                var env = await CoreWebView2Environment.CreateAsync(userDataFolder: userDataFolder);
+
+                await Web.EnsureCoreWebView2Async(env);
 
                 string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 string uiFolder = Path.Combine(assemblyPath, "ui");
                 string indexPath = Path.Combine(uiFolder, "index.html");
 
-                System.Diagnostics.Debug.WriteLine("=== Vidvat UI Loader ===");
-                System.Diagnostics.Debug.WriteLine("Assembly path: " + assemblyPath);
                 System.Diagnostics.Debug.WriteLine("UI folder: " + uiFolder);
                 System.Diagnostics.Debug.WriteLine("Index exists: " + File.Exists(indexPath));
-
-                if (!File.Exists(indexPath))
-                {
-                    Web.Source = new Uri("data:text/html,<h1>UI not found</h1>");
-                    return;
-                }
 
                 Web.CoreWebView2.SetVirtualHostNameToFolderMapping(
                     "app.vidvat",
@@ -47,8 +48,9 @@ namespace VidvatAssistant
             }
             catch (Exception ex)
             {
-                MessageBox.Show("WebView2 initialization error:\n" + ex.ToString());
+                MessageBox.Show("WebView2 failed:\n" + ex, "Vidvat");
             }
         }
     }
+
 }
