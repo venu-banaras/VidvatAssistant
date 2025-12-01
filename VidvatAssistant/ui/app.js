@@ -28,26 +28,37 @@ document.getElementById("btn-settings").onclick = () => switchPanel("panel-setti
 
 // -------- SETTINGS (Model selection) -------- //
 async function loadModels() {
-    const res = await fetch("http://localhost:8000/models");
-    const data = await res.json();
     const select = document.getElementById("model-select");
 
-    data.models.forEach(m => {
-        let option = document.createElement("option");
-        option.value = m;
-        option.textContent = m;
-        select.appendChild(option);
-    });
+    try {
+        const res = await fetch("http://localhost:8000/models");
+        const data = await res.json();
 
-    selectedModel = data.models[0];     // default
-    select.value = selectedModel;
+        select.innerHTML = "";  // clear old options
+
+        data.models.forEach(model => {
+            const opt = document.createElement("option");
+            opt.value = model;
+            opt.textContent = model;
+            select.appendChild(opt);
+        });
+
+    } catch (err) {
+        console.error("Failed to load models:", err);
+        select.innerHTML = "<option>Error loading models</option>";
+    }
 }
 
-document.getElementById("save-settings").onclick = () => {
-    selectedModel = document.getElementById("model-select").value;
-    alert("Model set to: " + selectedModel);
-    switchPanel("panel-chat");
-};
+document.getElementById("apply-model").addEventListener("click", () => {
+    const selected = document.getElementById("model-select").value;
+    console.log("Selected model:", selected);
+
+    // store model globally for chat use
+    window.currentModel = selected;
+});
+
+loadModels();
+
 
 
 // -------- CHAT -------- //
