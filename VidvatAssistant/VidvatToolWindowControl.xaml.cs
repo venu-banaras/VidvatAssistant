@@ -1,34 +1,54 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.Wpf;
+using System;
+using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace VidvatAssistant
 {
-    /// <summary>
-    /// Interaction logic for VidvatToolWindowControl.
-    /// </summary>
     public partial class VidvatToolWindowControl : UserControl
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="VidvatToolWindowControl"/> class.
-        /// </summary>
         public VidvatToolWindowControl()
         {
-            this.InitializeComponent();
+            InitializeComponent();
+            Loaded += ControlLoaded;
         }
 
-        /// <summary>
-        /// Handles click on the button by displaying a message box.
-        /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="e">The event args.</param>
-        [SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions", Justification = "Sample code")]
-        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Default event handler naming pattern")]
-        private void button1_Click(object sender, RoutedEventArgs e)
+        private async void ControlLoaded(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(
-                string.Format(System.Globalization.CultureInfo.CurrentUICulture, "Invoked '{0}'", this.ToString()),
-                "VidvatToolWindow");
+            try
+            {
+                await Web.EnsureCoreWebView2Async();
+
+                string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string uiFolder = Path.Combine(assemblyPath, "ui");
+                string indexPath = Path.Combine(uiFolder, "index.html");
+
+                System.Diagnostics.Debug.WriteLine("=== Vidvat UI Loader ===");
+                System.Diagnostics.Debug.WriteLine("Assembly path: " + assemblyPath);
+                System.Diagnostics.Debug.WriteLine("UI folder: " + uiFolder);
+                System.Diagnostics.Debug.WriteLine("Index exists: " + File.Exists(indexPath));
+
+                if (!File.Exists(indexPath))
+                {
+                    Web.Source = new Uri("data:text/html,<h1>UI not found</h1>");
+                    return;
+                }
+
+                Web.CoreWebView2.SetVirtualHostNameToFolderMapping(
+                    "app.vidvat",
+                    uiFolder,
+                    CoreWebView2HostResourceAccessKind.Allow
+                );
+
+                Web.Source = new Uri("https://app.vidvat/index.html");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("WebView2 initialization error:\n" + ex.ToString());
+            }
         }
     }
 }

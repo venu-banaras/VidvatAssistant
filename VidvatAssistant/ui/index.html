@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Vidvat Assistant</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div id="navbar">
+        <button id="btn-chat" class="nav-btn active">Chat</button>
+
+        <div id="btn-tools-wrapper">
+            <button id="btn-tools" class="nav-btn disabled" disabled>Code Tools ▾</button>
+
+            <!-- Dropdown -->
+            <div id="tools-dropdown" class="dropdown hidden">
+                <div class="dropdown-item disabled">Generate Code</div>
+                <div class="dropdown-item disabled">Explain Code</div>
+                <div class="dropdown-item disabled">Refactor Code</div>
+            </div>
+        </div>
+
+        <button id="btn-settings" class="nav-btn">Settings</button>
+    </div>
+
+
+    <div id="content-area">
+
+        <!-- --- CHAT PANEL --- -->
+        <div id="panel-chat" class="panel visible">
+            <div id="chat-window"></div>
+
+            <div id="controls">
+                <textarea id="prompt" placeholder="Ask Vidvat..."></textarea>
+                <button id="send">Send</button>
+            </div>
+        </div>
+
+        <!-- --- SETTINGS PANEL --- -->
+        <div id="panel-settings" class="panel hidden">
+            <h2>Select Model</h2>
+            <select id="model-select"></select>
+
+            <button id="save-settings">Save</button>
+        </div>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

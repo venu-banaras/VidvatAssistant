@@ -1,0 +1,105 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Segoe UI, sans-serif;
+    background: #1e1e1e;
+    color: white;
+}
+
+/* ---------------- NAVBAR ---------------- */
+#navbar {
+    display: flex;
+    background: #2d2d30;
+    padding: 6px;
+    gap: 6px;
+    border-bottom: 1px solid #3f3f46;
+}
+
+.nav-btn {
+    background: #3a3a3d;
+    border: none;
+    padding: 6px 12px;
+    color: white;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+    .nav-btn.active {
+        background: #007acc;
+    }
+
+    .nav-btn.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+/* ------------- DROPDOWN ------------- */
+#btn-tools-wrapper {
+    position: relative;
+}
+
+.dropdown {
+    position: absolute;
+    top: 32px;
+    left: 0;
+    background: #2d2d30;
+    border: 1px solid #3f3f46;
+    border-radius: 3px;
+    width: 150px;
+    z-index: 20;
+}
+
+.dropdown-item {
+    padding: 8px;
+    cursor: pointer;
+    color: white;
+}
+
+    .dropdown-item:hover {
+        background: #3d3d40;
+    }
+
+    .dropdown-item.disabled {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+
+.hidden {
+    display: none;
+}
+
+/* ---------------- CONTENT ---------------- */
+#content-area {
+    padding: 10px;
+}
+
+.panel {
+    display: none;
+}
+
+    .panel.visible {
+        display: block;
+    }
+
+/* Chat window */
+#chat-window {
+    height: 300px;
+    overflow-y: auto;
+    background: #252526;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #3f3f46;
+    margin-bottom: 8px;
+}
+
+/* Controls */
+#controls {
+    display: flex;
+    gap: 8px;
+}
+
+#prompt {
+    flex: 1;
+    height: 60px;
+}
