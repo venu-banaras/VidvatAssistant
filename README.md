@@ -10,7 +10,7 @@ Vidvat Assistant is an AI-powered sidebar for Visual Studio 2022 with:
 -  FastAPI backend  
 -  WebView2 UI embedded inside VS  
 
-<img src="screenshots/popup.png" width="400">
+<img src="VidvatAssistant/Resources/small.jpg" width="400">
 
 ---
 
