@@ -346,6 +346,30 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder
 .mfractor/
+# VS
+.vscode/
+.vs/
+bin/
+obj/
+*.user
+*.aps
+*.opendb
+*.VC.db
+
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Ollama model cache (large files)
+~/.ollama/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+*.vsix
 
 # Local History for Visual Studio
 .localhistory/
