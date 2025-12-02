@@ -88,6 +88,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\small.jpg" />
     <Content Include="Resources\VidvatToolWindowCommand.png" />
     <Content Include="ui\app.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

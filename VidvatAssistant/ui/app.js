@@ -1,5 +1,90 @@
 let selectedModel = null;
 
+// ---------- SETTINGS: Load fixed models ---------- //
+
+const MODEL_LIST = ["qwen3-coder", "codegemma", "codestral"];
+
+function loadModels() {
+    const select = document.getElementById("model-select");
+    select.innerHTML = "";
+
+    MODEL_LIST.forEach(m => {
+        const opt = document.createElement("option");
+        opt.value = m;
+        opt.textContent = m;
+        select.appendChild(opt);
+    });
+}
+
+document.getElementById("apply-model").onclick = async () => {
+    const selected = document.getElementById("model-select").value;
+    const statusBox = document.getElementById("model-status");
+
+    // Show progress message
+    statusBox.classList.remove("hidden");
+    statusBox.textContent = `[KINDLY WAIT, LLMs are large sized] Downloading model "${selected}"...`;
+
+    try {
+        const res = await fetch("http://localhost:8000/set_model", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ model: selected })
+        });
+
+        const data = await res.json();
+
+        if (data.detail) {
+            statusBox.textContent = "Error: " + data.detail;
+            return;
+        }
+
+        statusBox.textContent = `Model downloaded and applied: ${data.active_model} YAYY!!!`;
+    }
+    catch (err) {
+        console.error(err);
+        statusBox.textContent = "Download failed. Check backend.";
+    }
+};
+
+
+
+// ---------- CHAT ---------- //
+
+async function sendMessage() {
+    const prompt = document.getElementById("prompt").value;
+    if (!prompt.trim()) return;
+
+    const chatWindow = document.getElementById("chat-window");
+    chatWindow.innerHTML += `<div><b>You:</b> ${prompt}</div>`;
+
+    try {
+        const res = await fetch("http://localhost:8000/chat", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ prompt })
+        });
+
+        const data = await res.json();
+
+        if (data.detail) {
+            chatWindow.innerHTML += `<div><b>AI Error:</b> ${data.detail}</div>`;
+        } else {
+            chatWindow.innerHTML += `<div><b>AI:</b> ${data.response}</div>`;
+        }
+    }
+    catch (err) {
+        chatWindow.innerHTML += `<div><b>AI Error:</b> Backend not reachable.</div>`;
+    }
+
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+document.getElementById("send").onclick = sendMessage;
+
+
+// Init
+loadModels();
+
 // -------- NAVIGATION HANDLING -------- //
 function switchPanel(panel) {
     document.getElementById("panel-chat").classList.add("hidden");
@@ -25,65 +110,3 @@ function switchPanel(panel) {
 document.getElementById("btn-chat").onclick = () => switchPanel("panel-chat");
 document.getElementById("btn-settings").onclick = () => switchPanel("panel-settings");
 
-
-// -------- SETTINGS (Model selection) -------- //
-async function loadModels() {
-    const select = document.getElementById("model-select");
-
-    try {
-        const res = await fetch("http://localhost:8000/models");
-        const data = await res.json();
-
-        select.innerHTML = "";  // clear old options
-
-        data.models.forEach(model => {
-            const opt = document.createElement("option");
-            opt.value = model;
-            opt.textContent = model;
-            select.appendChild(opt);
-        });
-
-    } catch (err) {
-        console.error("Failed to load models:", err);
-        select.innerHTML = "<option>Error loading models</option>";
-    }
-}
-
-document.getElementById("apply-model").addEventListener("click", () => {
-    const selected = document.getElementById("model-select").value;
-    console.log("Selected model:", selected);
-
-    // store model globally for chat use
-    window.currentModel = selected;
-});
-
-loadModels();
-
-
-
-// -------- CHAT -------- //
-async function sendMessage() {
-    const prompt = document.getElementById("prompt").value;
-    const chatWindow = document.getElementById("chat-window");
-
-    if (!prompt.trim()) return;
-
-    chatWindow.innerHTML += `<div><b>You:</b> ${prompt}</div>`;
-
-    const res = await fetch("http://localhost:8000/chat", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ model: selectedModel, prompt })
-    });
-
-    const data = await res.json();
-
-    chatWindow.innerHTML += `<div><b>AI:</b> ${data.response}</div>`;
-    chatWindow.scrollTop = chatWindow.scrollHeight;
-}
-
-document.getElementById("send").onclick = sendMessage;
-
-
-// Initialize
-loadModels();
